@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F5F7F6;
+  --foreground: #1e3a8a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sage-100: #E7EFEA;
+  --color-sage-200: #D2DED8;
+  --color-sage-300: #CAD8D0;
+  --color-sage-400: #C8D6CF;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background-color: #F5F7F6;
+  color: #1e3a8a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
