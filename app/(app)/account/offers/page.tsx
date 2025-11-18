@@ -3,40 +3,43 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { loadOffers, saveOffers, type Offer } from "@/lib/offers-storage";
+import { getAllOffers, deleteOffer, setStatus, type Offer } from "@/lib/offers-storage";
+import Toast from "@/components/Toast";
 
 export default function OffersPage() {
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    setOffers(loadOffers());
+    setOffers(getAllOffers());
   }, []);
 
-  const handleToggleStatus = (id: string) => {
-    const updated = offers.map((offer) =>
-      offer.id === id
-        ? {
-            ...offer,
-            status:
-              offer.status === "published" ? ("paused" as const) : ("published" as const),
-          }
-        : offer
-    );
-    setOffers(updated);
-    saveOffers(updated);
+  const handleToggleStatus = (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "published" ? "paused" : "published";
+    const result = setStatus(id, newStatus);
+    
+    if (result) {
+      setOffers(getAllOffers());
+      setToast({
+        message: newStatus === "published" ? "Nabídka obnovena" : "Nabídka pozastavena",
+        type: "success",
+      });
+    } else {
+      setToast({ message: "Chyba při změně stavu", type: "error" });
+    }
   };
 
   const handleDelete = (id: string, title: string) => {
     if (confirm(`Opravdu chcete smazat nabídku "${title}"?`)) {
-      const updated = offers.filter((offer) => offer.id !== id);
-      setOffers(updated);
-      saveOffers(updated);
+      deleteOffer(id);
+      setOffers(getAllOffers());
+      setToast({ message: "Nabídka byla smazána", type: "success" });
     }
   };
 
-  const handleEdit = () => {
-    alert("Editace bude doplněna");
+  const handleEdit = (id: string) => {
+    router.push(`/account/offers/${id}/edit`);
   };
 
   return (
@@ -104,13 +107,13 @@ export default function OffersPage() {
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
                     <button
-                      onClick={handleEdit}
+                      onClick={() => handleEdit(offer.id)}
                       className="text-blue-700 hover:text-blue-900 text-xs"
                     >
                       Upravit
                     </button>
                     <button
-                      onClick={() => handleToggleStatus(offer.id)}
+                      onClick={() => handleToggleStatus(offer.id, offer.status)}
                       className="text-orange-700 hover:text-orange-900 text-xs"
                     >
                       {offer.status === "published" ? "Pozastavit" : "Obnovit"}
@@ -133,6 +136,14 @@ export default function OffersPage() {
           </div>
         )}
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

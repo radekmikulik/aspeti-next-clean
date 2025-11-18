@@ -1,54 +1,95 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createOffer } from "@/lib/offers-storage";
+import { getOffer, updateOffer, type Offer } from "@/lib/offers-storage";
 import Toast from "@/components/Toast";
 
-export default function NewOfferPage() {
+type EditOfferPageProps = {
+  params: {
+    id: string;
+  };
+};
+
+export default function EditOfferPage({ params }: EditOfferPageProps) {
   const router = useRouter();
+  const [offer, setOffer] = useState<Offer | null>(null);
+  const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  
   const [formData, setFormData] = useState({
     title: "",
     category: "Beauty & Wellbeing",
     city: "",
     price: "",
     description: "",
-    vipHighlight: false,
-    publishImmediately: false,
   });
 
-  const handleSubmit = (status: "draft" | "published") => {
+  useEffect(() => {
+    const loadedOffer = getOffer(params.id);
+    
+    if (!loadedOffer) {
+      setToast({ message: "Nabídka nebyla nalezena", type: "error" });
+      setTimeout(() => router.push("/account/offers"), 2000);
+      return;
+    }
+
+    setOffer(loadedOffer);
+    setFormData({
+      title: loadedOffer.title,
+      category: loadedOffer.category,
+      city: loadedOffer.city,
+      price: loadedOffer.price,
+      description: "",
+    });
+    setLoading(false);
+  }, [params.id, router]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!formData.title.trim()) {
       setToast({ message: "Vyplňte název nabídky", type: "error" });
       return;
     }
 
-    const newOffer = createOffer({
+    const result = updateOffer(params.id, {
       title: formData.title,
       category: formData.category,
-      city: formData.city || "Nespecifikováno",
-      price: formData.price || "Cena na dotaz",
-      status: formData.publishImmediately ? "published" : status,
+      city: formData.city,
+      price: formData.price,
     });
 
-    if (newOffer) {
-      setToast({
-        message: status === "published" ? "Nabídka publikována" : "Koncept uložen",
-        type: "success",
-      });
+    if (result) {
+      setToast({ message: "Nabídka byla úspěšně upravena", type: "success" });
       setTimeout(() => router.push("/account/offers"), 1500);
     } else {
-      setToast({ message: "Chyba při vytváření nabídky", type: "error" });
+      setToast({ message: "Chyba při ukládání nabídky", type: "error" });
     }
   };
 
+  const handleCancel = () => {
+    router.push("/account/offers");
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-gray-500">Načítání...</div>
+      </div>
+    );
+  }
+
+  if (!offer) {
+    return null;
+  }
+
   return (
     <div className="space-y-6 max-w-3xl">
-      <h1 className="text-3xl font-bold text-blue-900">Přidat nabídku</h1>
+      <h1 className="text-3xl font-bold text-blue-900">Upravit nabídku</h1>
 
       <div className="rounded-md border border-[#D2DED8] bg-white p-6 shadow-sm">
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Název nabídky *
@@ -129,50 +170,19 @@ export default function NewOfferPage() {
             />
           </div>
 
-          <div className="space-y-3">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.vipHighlight}
-                onChange={(e) =>
-                  setFormData({ ...formData, vipHighlight: e.target.checked })
-                }
-                className="w-4 h-4 text-blue-900 border-gray-300 rounded"
-              />
-              <span className="text-sm text-gray-700">VIP zvýraznění</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.publishImmediately}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    publishImmediately: e.target.checked,
-                  })
-                }
-                className="w-4 h-4 text-blue-900 border-gray-300 rounded"
-              />
-              <span className="text-sm text-gray-700">
-                Okamžitě publikovat
-              </span>
-            </label>
-          </div>
-
           <div className="flex gap-4 pt-4">
             <button
               type="button"
-              onClick={() => handleSubmit("draft")}
+              onClick={handleCancel}
               className="px-6 py-2 border border-[#D2DED8] text-blue-900 rounded-md hover:bg-[#E7EFEA] transition-colors"
             >
-              Uložit koncept
+              Zrušit
             </button>
             <button
-              type="button"
-              onClick={() => handleSubmit("published")}
+              type="submit"
               className="px-6 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800 transition-colors"
             >
-              Publikovat
+              Uložit změny
             </button>
           </div>
         </form>
