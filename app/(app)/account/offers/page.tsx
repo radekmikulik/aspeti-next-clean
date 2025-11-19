@@ -6,6 +6,7 @@ import {
   getAllOffers,
   setStatus,
   deleteOffer,
+  duplicateOffer,
 } from "@/lib/offers-storage";
 
 type OfferStatus = "draft" | "published" | "paused";
@@ -15,7 +16,16 @@ interface Offer {
   title: string;
   category: string;
   city: string;
+  streetAddress?: string;
   price: string;
+  description?: string;
+  priceVariants?: string;
+  bonusText?: string;
+  duration?: string;
+  included?: string;
+  conditions?: string;
+  suitableFor?: string;
+  availabilityNote?: string;
   status: OfferStatus;
   createdAt: string;
 }
@@ -28,7 +38,6 @@ export default function OffersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // localStorage je dostupné jen v browseru; komponenta je client-only.
     const data = getAllOffers() as Offer[] | null;
     setOffers(Array.isArray(data) ? data : []);
     setLoading(false);
@@ -42,13 +51,19 @@ export default function OffersPage() {
   const handleSetStatus = (id: string, status: OfferStatus) => {
     setStatus(id, status);
     reloadOffers();
-    // TODO(TOAST): Po integraci toast systému zde zobrazit success/info notifikaci.
+    // TODO(TOAST): success/info - změna stavu nabídky
   };
 
   const handleDelete = (id: string) => {
     deleteOffer(id);
     reloadOffers();
-    // TODO(TOAST): Po integraci toast systému zde zobrazit success notifikaci.
+    // TODO(TOAST): success - nabídka smazána
+  };
+
+  const handleDuplicate = (id: string) => {
+    duplicateOffer(id);
+    reloadOffers();
+    // TODO(TOAST): success - vytvořen duplikát jako koncept
   };
 
   return (
@@ -75,7 +90,7 @@ export default function OffersPage() {
           <span className="font-medium"> „Přidat nabídku"</span> vpravo nahoře.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-gray-200">
+        <div className="overflow-x-auto rounded-md border border-gray-200 bg-white">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
@@ -99,7 +114,7 @@ export default function OffersPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 bg-white">
+            <tbody className="divide-y divide-gray-100">
               {offers.map((offer) => (
                 <tr key={offer.id}>
                   <td className="whitespace-nowrap px-4 py-3">
@@ -123,7 +138,7 @@ export default function OffersPage() {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
                     {/* BLOCK: OFFERS_TABLE_ACTIONS */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                       {/* Upravit */}
                       <Link
                         href={`/account/offers/${offer.id}/edit`}
@@ -131,6 +146,15 @@ export default function OffersPage() {
                       >
                         Upravit
                       </Link>
+
+                      {/* Duplikovat */}
+                      <button
+                        type="button"
+                        onClick={() => handleDuplicate(offer.id)}
+                        className="text-sm hover:underline"
+                      >
+                        Duplikovat
+                      </button>
 
                       {/* Pozastavit / Obnovit */}
                       {offer.status === "paused" ? (
@@ -164,7 +188,7 @@ export default function OffersPage() {
                         Smazat
                       </button>
                     </div>
-                    {/* UPDATE(2025-11-19): Tlačítko "Upravit" vede na /account/offers/[id]/edit */}
+                    {/* UPDATE(2025-11-19): Přidána akce "Duplikovat" - vytvoří koncept z existující nabídky */}
                     {/* END BLOCK: OFFERS_TABLE_ACTIONS */}
                   </td>
                 </tr>

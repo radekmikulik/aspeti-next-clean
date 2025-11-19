@@ -183,3 +183,37 @@ export function setStatus(
   // UPDATE(2025-11-19): Typová úprava pro rozšíření Offer
   return updateOffer(id, { status });
 }
+
+// ADD(2025-11-19): duplicateOffer - vytvoření kopie nabídky jako koncept
+export function duplicateOffer(id: string): Offer | null {
+  const offers = loadOffers();
+  const originalOffer = offers.find((offer) => offer.id === id);
+  
+  if (!originalOffer) {
+    return null;
+  }
+  
+  const duplicatedOffer: Offer = {
+    id: Date.now().toString(),
+    title: originalOffer.title,
+    category: originalOffer.category,
+    city: originalOffer.city,
+    streetAddress: originalOffer.streetAddress,
+    price: originalOffer.price,
+    description: originalOffer.description,
+    priceVariants: originalOffer.priceVariants,
+    bonusText: originalOffer.bonusText,
+    duration: originalOffer.duration,
+    included: originalOffer.included,
+    conditions: originalOffer.conditions,
+    suitableFor: originalOffer.suitableFor,
+    availabilityNote: originalOffer.availabilityNote,
+    status: "draft",
+    createdAt: new Date().toISOString(),
+  };
+  
+  const updatedOffers = [...offers, duplicatedOffer];
+  saveOffers(updatedOffers);
+  
+  return duplicatedOffer;
+}
