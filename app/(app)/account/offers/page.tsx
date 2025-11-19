@@ -70,7 +70,7 @@ export default function OffersPage() {
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h1 className="text-lg font-semibold">
-          Moje nabídky
+          Moje nabídky (S06 Duplikování implementováno)
         </h1>
         <Link
           href="/account/offers/new"
