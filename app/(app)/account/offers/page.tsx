@@ -1,149 +1,180 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getAllOffers, deleteOffer, setStatus, type Offer } from "@/lib/offers-storage";
-import Toast from "@/components/Toast";
+import {
+  getAllOffers,
+  setStatus,
+  deleteOffer,
+} from "@/lib/offers-storage";
+
+type OfferStatus = "draft" | "published" | "paused";
+
+interface Offer {
+  id: string;
+  title: string;
+  category: string;
+  city: string;
+  price: string;
+  status: OfferStatus;
+  createdAt: string;
+}
+
+// BLOCK: OFFERS_PAGE
+// PURPOSE: Výpis a základní správa nabídek na route /account/offers
 
 export default function OffersPage() {
   const [offers, setOffers] = useState<Offer[]>([]);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setOffers(getAllOffers());
+    // localStorage je dostupné jen v browseru; komponenta je client-only.
+    const data = getAllOffers() as Offer[] | null;
+    setOffers(Array.isArray(data) ? data : []);
+    setLoading(false);
   }, []);
 
-  const handleToggleStatus = (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === "published" ? "paused" : "published";
-    const result = setStatus(id, newStatus);
-    
-    if (result) {
-      setOffers(getAllOffers());
-      setToast({
-        message: newStatus === "published" ? "Nabídka obnovena" : "Nabídka pozastavena",
-        type: "success",
-      });
-    } else {
-      setToast({ message: "Chyba při změně stavu", type: "error" });
-    }
+  const reloadOffers = () => {
+    const data = getAllOffers() as Offer[] | null;
+    setOffers(Array.isArray(data) ? data : []);
   };
 
-  const handleDelete = (id: string, title: string) => {
-    if (confirm(`Opravdu chcete smazat nabídku "${title}"?`)) {
-      deleteOffer(id);
-      setOffers(getAllOffers());
-      setToast({ message: "Nabídka byla smazána", type: "success" });
-    }
+  const handleSetStatus = (id: string, status: OfferStatus) => {
+    setStatus(id, status);
+    reloadOffers();
+    // TODO(TOAST): Po integraci toast systému zde zobrazit success/info notifikaci.
   };
 
-  const handleEdit = (id: string) => {
-    router.push(`/account/offers/${id}/edit`);
+  const handleDelete = (id: string) => {
+    deleteOffer(id);
+    reloadOffers();
+    // TODO(TOAST): Po integraci toast systému zde zobrazit success notifikaci.
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-blue-900">Moje nabídky</h1>
+    <div className="p-6">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h1 className="text-lg font-semibold">
+          Moje nabídky
+        </h1>
         <Link
           href="/account/offers/new"
-          className="px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800 transition-colors"
+          className="rounded-md px-3 py-2 text-sm font-medium border border-gray-300 hover:bg-gray-50"
         >
           Přidat nabídku
         </Link>
       </div>
 
-      <div className="bg-white border border-[#D2DED8] rounded-md shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-[#E7EFEA] border-b border-[#D2DED8]">
-            <tr>
-              <th className="text-left px-4 py-3 font-semibold text-blue-900">
-                Název
-              </th>
-              <th className="text-left px-4 py-3 font-semibold text-blue-900">
-                Město
-              </th>
-              <th className="text-left px-4 py-3 font-semibold text-blue-900">
-                Cena
-              </th>
-              <th className="text-left px-4 py-3 font-semibold text-blue-900">
-                Stav
-              </th>
-              <th className="text-left px-4 py-3 font-semibold text-blue-900">
-                Vytvořeno
-              </th>
-              <th className="text-left px-4 py-3 font-semibold text-blue-900">
-                Akce
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {offers.map((offer) => (
-              <tr key={offer.id} className="border-b border-[#D2DED8] last:border-b-0">
-                <td className="px-4 py-3 font-medium">{offer.title}</td>
-                <td className="px-4 py-3 text-gray-600">{offer.city}</td>
-                <td className="px-4 py-3 text-gray-600">{offer.price}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-block px-2 py-1 text-xs rounded-full ${
-                      offer.status === "published"
-                        ? "bg-green-100 text-green-800"
-                        : offer.status === "paused"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {offer.status === "published"
-                      ? "Publikováno"
-                      : offer.status === "paused"
-                      ? "Pozastaveno"
-                      : "Koncept"}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-gray-600">
-                  {new Date(offer.createdAt).toLocaleDateString("cs-CZ")}
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(offer.id)}
-                      className="text-blue-700 hover:text-blue-900 text-xs"
-                    >
-                      Upravit
-                    </button>
-                    <button
-                      onClick={() => handleToggleStatus(offer.id, offer.status)}
-                      className="text-orange-700 hover:text-orange-900 text-xs"
-                    >
-                      {offer.status === "published" ? "Pozastavit" : "Obnovit"}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(offer.id, offer.title)}
-                      className="text-red-700 hover:text-red-900 text-xs"
-                    >
-                      Smazat
-                    </button>
-                  </div>
-                </td>
+      {loading ? (
+        <div className="text-sm text-gray-600">
+          Načítám nabídky…
+        </div>
+      ) : offers.length === 0 ? (
+        <div className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-700">
+          Zatím nemáte žádné nabídky. Přidejte první pomocí tlačítka
+          <span className="font-medium"> „Přidat nabídku"</span> vpravo nahoře.
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-md border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-left font-medium text-gray-700">
+                  Název
+                </th>
+                <th className="px-4 py-2 text-left font-medium text-gray-700">
+                  Město
+                </th>
+                <th className="px-4 py-2 text-left font-medium text-gray-700">
+                  Cena
+                </th>
+                <th className="px-4 py-2 text-left font-medium text-gray-700">
+                  Stav
+                </th>
+                <th className="px-4 py-2 text-left font-medium text-gray-700">
+                  Vytvořeno
+                </th>
+                <th className="px-4 py-2 text-left font-medium text-gray-700">
+                  Akce
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {offers.length === 0 && (
-          <div className="px-4 py-8 text-center text-gray-500">
-            Zatím nemáte žádné nabídky. Přidejte první nabídku.
-          </div>
-        )}
-      </div>
+            </thead>
+            <tbody className="divide-y divide-gray-100 bg-white">
+              {offers.map((offer) => (
+                <tr key={offer.id}>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {offer.title}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {offer.city}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {offer.price} Kč
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 capitalize">
+                    {offer.status === "draft"
+                      ? "Koncept"
+                      : offer.status === "published"
+                      ? "Publikováno"
+                      : "Pozastaveno"}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500">
+                    {new Date(offer.createdAt).toLocaleString("cs-CZ")}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {/* BLOCK: OFFERS_TABLE_ACTIONS */}
+                    <div className="flex items-center gap-3">
+                      {/* Upravit */}
+                      <Link
+                        href={`/account/offers/${offer.id}/edit`}
+                        className="text-sm text-blue-700 hover:underline"
+                      >
+                        Upravit
+                      </Link>
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
+                      {/* Pozastavit / Obnovit */}
+                      {offer.status === "paused" ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSetStatus(offer.id, "published")
+                          }
+                          className="text-sm hover:underline"
+                        >
+                          Obnovit
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSetStatus(offer.id, "paused")
+                          }
+                          className="text-sm hover:underline"
+                        >
+                          Pozastavit
+                        </button>
+                      )}
+
+                      {/* Smazat */}
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(offer.id)}
+                        className="text-sm text-red-700 hover:underline"
+                      >
+                        Smazat
+                      </button>
+                    </div>
+                    {/* UPDATE(2025-11-19): Tlačítko "Upravit" vede na /account/offers/[id]/edit */}
+                    {/* END BLOCK: OFFERS_TABLE_ACTIONS */}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
 }
+
+// END BLOCK: OFFERS_PAGE
