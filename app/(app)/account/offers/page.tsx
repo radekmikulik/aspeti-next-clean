@@ -19,6 +19,9 @@ export default function OffersPage() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
 
+  type StatusFilter = "all" | "active" | "inactive" | "draft";
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+
   useEffect(() => {
     const data = getAllOffers() as Offer[] | null;
     setOffers(Array.isArray(data) ? data : []);
@@ -73,6 +76,14 @@ export default function OffersPage() {
     }
   };
 
+  const filteredOffers = offers.filter((offer) => {
+    if (statusFilter === "all") return true;
+    if (statusFilter === "draft") return offer.status === "draft";
+    if (statusFilter === "active") return offer.status === "published";
+    if (statusFilter === "inactive") return offer.status === "paused";
+    return true;
+  });
+
   return (
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -87,14 +98,55 @@ export default function OffersPage() {
         </Link>
       </div>
 
+      {/* BLOCK: OFFERS_STATUS_FILTER */}
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
+        <span className="text-gray-600">Filtrovat podle stavu:</span>
+        {(
+          [
+            { value: "all", label: "Vše" },
+            { value: "active", label: "Aktivní" },
+            { value: "inactive", label: "Neaktivní" },
+            { value: "draft", label: "Koncept" },
+          ] as const
+        ).map((item) => {
+          const isActive = statusFilter === item.value;
+          return (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => setStatusFilter(item.value)}
+              className={[
+                "rounded-full border px-3 py-1",
+                "transition text-xs",
+                isActive
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-800"
+                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
+              ].join(" ")}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+      {/* END BLOCK: OFFERS_STATUS_FILTER */}
+
       {loading ? (
         <div className="text-sm text-gray-600">
           Načítám nabídky…
         </div>
-      ) : offers.length === 0 ? (
+      ) : filteredOffers.length === 0 ? (
         <div className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-700">
-          Zatím nemáte žádné nabídky. Přidejte první pomocí tlačítka
-          <span className="font-medium"> „Přidat nabídku"</span> vpravo nahoře.
+          {statusFilter === "all" ? (
+            <>
+              Zatím nemáte žádné nabídky. Přidejte první pomocí tlačítka
+              <span className="font-medium"> „Přidat nabídku"</span> vpravo nahoře.
+            </>
+          ) : (
+            <>
+              Žádné nabídky nenalezeny pro vybraný filtr „{statusFilter === "active" ? "Aktivní" : statusFilter === "inactive" ? "Neaktivní" : "Koncept"}".
+              Zkuste vybrat jiný filtr nebo přidat novou nabídku.
+            </>
+          )}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-md border border-gray-200 bg-white">
@@ -122,7 +174,7 @@ export default function OffersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {offers.map((offer) => (
+              {filteredOffers.map((offer) => (
                 <tr key={offer.id}>
                   <td className="whitespace-nowrap px-4 py-3">
                     {offer.title}
@@ -133,12 +185,24 @@ export default function OffersPage() {
                   <td className="whitespace-nowrap px-4 py-3">
                     {offer.price} Kč
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 capitalize">
-                    {offer.status === "draft"
-                      ? "Koncept"
-                      : offer.status === "published"
-                      ? "Publikováno"
-                      : "Pozastaveno"}
+                  <td className="whitespace-nowrap px-4 py-3">
+                    {/* BLOCK: OFFER_STATUS_BADGE */}
+                    {offer.status === "draft" && (
+                      <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-800">
+                        Koncept
+                      </span>
+                    )}
+                    {offer.status === "published" && (
+                      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800">
+                        Aktivní
+                      </span>
+                    )}
+                    {offer.status === "paused" && (
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                        Neaktivní
+                      </span>
+                    )}
+                    {/* END BLOCK: OFFER_STATUS_BADGE */}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500">
                     {new Date(offer.createdAt).toLocaleString("cs-CZ")}
