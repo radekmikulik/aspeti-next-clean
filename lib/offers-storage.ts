@@ -16,6 +16,9 @@ export type Offer = {
   conditions?: string;
   suitableFor?: string;
   availabilityNote?: string;
+  // ADD(2025-11-19): Strukturované kategorie ASPETi
+  mainCategoryLabel?: string;      // Např. "Krása a pohoda"
+  subcategoriesLabels?: string[];  // Např. ["Kosmetika", "Wellness"]
 };
 
 export type NewOfferInput = {
@@ -35,6 +38,9 @@ export type NewOfferInput = {
   conditions?: string;
   suitableFor?: string;
   availabilityNote?: string;
+  // ADD(2025-11-19): Strukturované kategorie ASPETi
+  mainCategoryLabel?: string;      // Např. "Krása a pohoda"
+  subcategoriesLabels?: string[];  // Např. ["Kosmetika", "Wellness"]
 };
 
 const STORAGE_KEY = "aspeti_offers_v1";
@@ -110,10 +116,15 @@ export function getOffer(id: string): Offer | null {
  * Vytvoří novou nabídku
  */
 export function createOffer(input: NewOfferInput): Offer {
+  const mainCategoryLabel =
+    input.mainCategoryLabel ?? input.category ?? "Nezařazeno";
+
+  const subcategoriesLabels = input.subcategoriesLabels ?? [];
+
   const newOffer: Offer = {
     id: Date.now().toString(),
     title: input.title,
-    category: input.category,
+    category: mainCategoryLabel,        // pro kompatibilitu
     city: input.city,
     price: input.price,
     status: input.status || "draft",
@@ -128,6 +139,9 @@ export function createOffer(input: NewOfferInput): Offer {
     conditions: input.conditions,
     suitableFor: input.suitableFor,
     availabilityNote: input.availabilityNote,
+    // ADD(2025-11-19): Strukturované kategorie ASPETi
+    mainCategoryLabel,
+    subcategoriesLabels,
   };
 
   const offers = loadOffers();
@@ -151,12 +165,23 @@ export function updateOffer(id: string, patch: Partial<Offer>): Offer | null {
 
   // UPDATE(2025-11-19): Zachování původních polí (id, createdAt) + aplikace patch
   const existing = offers[index];
-  const updatedOffer = { 
-    ...existing, 
-    ...patch, 
+  
+  const mainCategoryLabel =
+    patch.mainCategoryLabel ?? existing.mainCategoryLabel ?? existing.category;
+
+  const subcategoriesLabels =
+    patch.subcategoriesLabels ?? existing.subcategoriesLabels ?? [];
+
+  const updatedOffer: Offer = {
+    ...existing,
+    ...patch,
     id: existing.id, // Zachovat původní ID
     createdAt: existing.createdAt, // Zachovat původní createdAt
+    category: mainCategoryLabel ?? existing.category,
+    mainCategoryLabel,
+    subcategoriesLabels,
   };
+
   const updated = [...offers];
   updated[index] = updatedOffer;
   saveOffers(updated);
@@ -220,6 +245,9 @@ export function duplicateOffer(id: string): Offer | null {
     conditions: originalOffer.conditions,
     suitableFor: originalOffer.suitableFor,
     availabilityNote: originalOffer.availabilityNote,
+    // ADD(2025-11-19): Strukturované kategorie - zkopírovat i nová pole
+    mainCategoryLabel: originalOffer.mainCategoryLabel,
+    subcategoriesLabels: originalOffer.subcategoriesLabels,
     status: "draft",
     createdAt: new Date().toISOString(),
   };

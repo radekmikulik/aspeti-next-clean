@@ -3,27 +3,68 @@
 import { useEffect, useState, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getOffer, updateOffer } from "@/lib/offers-storage";
+import { getOffer, updateOffer, type Offer } from "@/lib/offers-storage";
 
 type OfferStatus = "draft" | "published" | "paused";
 
-interface Offer {
-  id: string;
-  title: string;
-  category: string;
-  city: string;
-  streetAddress?: string;
-  price: string;
-  description?: string;
-  priceVariants?: string;
-  bonusText?: string;
-  duration?: string;
-  included?: string;
-  conditions?: string;
-  suitableFor?: string;
-  availabilityNote?: string;
-  status: OfferStatus;
-  createdAt: string;
+// Konfigurace kategorií a podkategorií ASPETi
+const MAIN_CATEGORIES = [
+  { value: "beauty",        label: "Krása a pohoda" },
+  { value: "gastro",        label: "Gastro" },
+  { value: "accommodation", label: "Ubytování" },
+  { value: "realestate",    label: "Reality" },
+  { value: "crafts",        label: "Řemesla" },
+] as const;
+
+type MainCategoryValue = (typeof MAIN_CATEGORIES)[number]["value"];
+
+const SUBCATEGORIES: Record<
+  MainCategoryValue,
+  { value: string; label: string }[]
+> = {
+  beauty: [
+    { value: "kosmetika",   label: "Kosmetika" },
+    { value: "wellness",    label: "Wellness" },
+    { value: "masaze",      label: "Masáže" },
+    { value: "kadernictvi", label: "Kadeřnictví" },
+    { value: "nehty",       label: "Nehty" },
+    { value: "lashbrow",    label: "Lash & Brow" },
+  ],
+  gastro: [
+    { value: "restaurace",  label: "Restaurace" },
+    { value: "kavarna",     label: "Kavárna" },
+    { value: "bistro",      label: "Bistro" },
+    { value: "bar",         label: "Bar" },
+    { value: "cukrarna",    label: "Cukrárna" },
+  ],
+  accommodation: [
+    { value: "hotel",       label: "Hotel" },
+    { value: "penzion",     label: "Penzion" },
+    { value: "apartman",    label: "Apartmán" },
+  ],
+  realestate: [
+    { value: "prodej",      label: "Prodej" },
+    { value: "pronajem",    label: "Pronájem" },
+    { value: "komercni",    label: "Komerční prostory" },
+  ],
+  crafts: [
+    { value: "elektrikar",  label: "Elektrikář" },
+    { value: "instalater",  label: "Instalatér" },
+    { value: "malir",       label: "Malíř / Natěrač" },
+    { value: "uklid",       label: "Úklidové služby" },
+  ],
+};
+
+function getMainCategoryLabel(value: MainCategoryValue | ""): string | undefined {
+  return MAIN_CATEGORIES.find((c) => c.value === value)?.label;
+}
+
+function getMainCategoryValueFromLabel(
+  label?: string | null
+): MainCategoryValue | "" {
+  if (!label) return "";
+  const found = MAIN_CATEGORIES.find((c) => c.label === label);
+  return found ? found.value : "";
 }
 
 // BLOCK: OFFER_EDIT_PAGE
@@ -36,6 +77,12 @@ export default function OfferEditPage() {
   const [offer, setOffer] = useState<Offer | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  // Stav pro strukturované kategorie
+  const [mainCategoryValue, setMainCategoryValue] =
+    useState<MainCategoryValue | "">("");
+  const [selectedSubcategoryValues, setSelectedSubcategoryValues] =
+    useState<string[]>([]);
 
   useEffect(() => {
     const id = params?.id;
@@ -57,6 +104,32 @@ export default function OfferEditPage() {
     setLoading(false);
   }, [params]);
 
+  // Inicializace kategorií po načtení nabídky
+  useEffect(() => {
+    if (!offer) return;
+
+    const initialMainValue = getMainCategoryValueFromLabel(
+      offer.mainCategoryLabel ?? offer.category
+    );
+
+    setMainCategoryValue(initialMainValue);
+
+    if (
+      initialMainValue &&
+      Array.isArray(offer.subcategoriesLabels) &&
+      offer.subcategoriesLabels.length > 0
+    ) {
+      const available = SUBCATEGORIES[initialMainValue] ?? [];
+      const initialSubValues = available
+        .filter((sub) => offer.subcategoriesLabels?.includes(sub.label))
+        .map((sub) => sub.value);
+
+      setSelectedSubcategoryValues(initialSubValues);
+    } else {
+      setSelectedSubcategoryValues([]);
+    }
+  }, [offer]);
+
   const handleChange =
     (field: keyof Offer) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -71,9 +144,22 @@ export default function OfferEditPage() {
     event.preventDefault();
     if (!offer) return;
 
+    const mainCategoryLabel =
+      getMainCategoryLabel(mainCategoryValue) ??
+      offer?.mainCategoryLabel ??
+      offer?.category ??
+      "Nezařazeno";
+
+    const subcategoriesLabels =
+      mainCategoryValue && SUBCATEGORIES[mainCategoryValue]
+        ? SUBCATEGORIES[mainCategoryValue]
+            .filter((sub) => selectedSubcategoryValues.includes(sub.value))
+            .map((sub) => sub.label)
+        : [];
+
     updateOffer(offer.id, {
       title: offer.title,
-      category: offer.category,
+      category: mainCategoryLabel,
       city: offer.city,
       streetAddress: offer.streetAddress,
       price: offer.price,
@@ -86,6 +172,9 @@ export default function OfferEditPage() {
       suitableFor: offer.suitableFor,
       availabilityNote: offer.availabilityNote,
       status: offer.status,
+      // ADD(2025-11-19): Strukturované kategorie
+      mainCategoryLabel,
+      subcategoriesLabels,
     });
     // TODO(TOAST): Po integraci toast systému zde zobrazit success notifikaci.
 
@@ -152,18 +241,69 @@ export default function OfferEditPage() {
           </div>
 
           {/* Kategorie */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Kategorie <span className="text-red-600">*</span>
+          {/* BLOCK: OFFER_CATEGORIES_EDIT */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-900">
+              Kategorie <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={offer.category}
-              onChange={handleChange("category")}
+            <p className="text-xs text-gray-600">
+              Vyberte hlavní kategorii a případně jednu nebo více podkategorií.
+            </p>
+
+            {/* Hlavní kategorie */}
+            <select
+              value={mainCategoryValue}
+              onChange={(e) => {
+                const value = e.target.value as MainCategoryValue | "";
+                setMainCategoryValue(value);
+                setSelectedSubcategoryValues([]);
+              }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600"
               required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            />
+            >
+              <option value="">Vyberte kategorii…</option>
+              {MAIN_CATEGORIES.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+
+            {/* Podkategorie */}
+            {mainCategoryValue && (
+              <div className="mt-2 space-y-1">
+                <div className="text-xs font-medium text-gray-700">
+                  Podkategorie (volitelné)
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {SUBCATEGORIES[mainCategoryValue].map((sub) => {
+                    const checked = selectedSubcategoryValues.includes(sub.value);
+                    return (
+                      <label
+                        key={sub.value}
+                        className="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs text-gray-800 hover:bg-gray-50"
+                      >
+                        <input
+                          type="checkbox"
+                          className="h-3 w-3 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
+                          checked={checked}
+                          onChange={() => {
+                            setSelectedSubcategoryValues((prev) =>
+                              checked
+                                ? prev.filter((v) => v !== sub.value)
+                                : [...prev, sub.value]
+                            );
+                          }}
+                        />
+                        <span>{sub.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
+          {/* END BLOCK: OFFER_CATEGORIES_EDIT */}
 
           {/* Lokalita: město + ulice */}
           <div className="grid gap-3 md:grid-cols-2">
