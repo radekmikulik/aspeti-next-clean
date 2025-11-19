@@ -1,190 +1,352 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createOffer } from "@/lib/offers-storage";
-import Toast from "@/components/Toast";
 
-export default function NewOfferPage() {
+type OfferStatus = "draft" | "published" | "paused";
+
+interface NewOfferFormValues {
+  title: string;
+  category: string;
+  city: string;
+  streetAddress: string;
+  price: string;
+  description: string;
+  priceVariants: string;
+  bonusText: string;
+  duration: string;
+  included: string;
+  conditions: string;
+  suitableFor: string;
+  availabilityNote: string;
+}
+
+// BLOCK: OFFER_NEW_PAGE
+// PURPOSE: Formulář pro vytvoření nové nabídky na /account/offers/new
+
+export default function OfferNewPage() {
   const router = useRouter();
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-  const [formData, setFormData] = useState({
+  const [submitStatus, setSubmitStatus] = useState<OfferStatus>("draft");
+
+  const [form, setForm] = useState<NewOfferFormValues>({
     title: "",
-    category: "Beauty & Wellbeing",
+    category: "",
     city: "",
+    streetAddress: "",
     price: "",
     description: "",
-    vipHighlight: false,
-    publishImmediately: false,
+    priceVariants: "",
+    bonusText: "",
+    duration: "",
+    included: "",
+    conditions: "",
+    suitableFor: "",
+    availabilityNote: "",
   });
 
-  const handleSubmit = (status: "draft" | "published") => {
-    if (!formData.title.trim()) {
-      setToast({ message: "Vyplňte název nabídky", type: "error" });
-      return;
-    }
+  const handleChange =
+    (field: keyof NewOfferFormValues) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }));
+    };
 
-    const newOffer = createOffer({
-      title: formData.title,
-      category: formData.category,
-      city: formData.city || "Nespecifikováno",
-      price: formData.price || "Cena na dotaz",
-      status: formData.publishImmediately ? "published" : status,
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // Předpoklad: createOffer(data) vytvoří nabídku, vygeneruje id a createdAt.
+    createOffer({
+      title: form.title,
+      category: form.category,
+      city: form.city,
+      streetAddress: form.streetAddress || undefined,
+      price: form.price,
+      description: form.description || undefined,
+      priceVariants: form.priceVariants || undefined,
+      bonusText: form.bonusText || undefined,
+      duration: form.duration || undefined,
+      included: form.included || undefined,
+      conditions: form.conditions || undefined,
+      suitableFor: form.suitableFor || undefined,
+      availabilityNote: form.availabilityNote || undefined,
+      status: submitStatus,
     });
 
-    if (newOffer) {
-      setToast({
-        message: status === "published" ? "Nabídka publikována" : "Koncept uložen",
-        type: "success",
-      });
-      setTimeout(() => router.push("/account/offers"), 1500);
-    } else {
-      setToast({ message: "Chyba při vytváření nabídky", type: "error" });
-    }
+    // TODO(TOAST): Po integraci toast systému zde zobrazit success notifikaci.
+
+    router.push("/account/offers");
   };
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <h1 className="text-3xl font-bold text-blue-900">Přidat nabídku</h1>
-
-      <div className="rounded-md border border-[#D2DED8] bg-white p-6 shadow-sm">
-        <form className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Název nabídky *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-[#D2DED8] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="např. Relaxační masáž 60 min"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Kategorie
-            </label>
-            <select
-              value={formData.category}
-              onChange={(e) =>
-                setFormData({ ...formData, category: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-[#D2DED8] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option>Beauty & Wellbeing</option>
-              <option>Gastro</option>
-              <option>Ubytování</option>
-              <option>Reality</option>
-              <option>Řemesla</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Město/pobočka
-            </label>
-            <input
-              type="text"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, city: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-[#D2DED8] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="např. Praha 2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Cena
-            </label>
-            <input
-              type="text"
-              value={formData.price}
-              onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-[#D2DED8] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="např. 590 Kč"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Popis
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              rows={4}
-              className="w-full px-3 py-2 border border-[#D2DED8] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Popište vaši nabídku..."
-            />
-          </div>
-
-          <div className="space-y-3">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.vipHighlight}
-                onChange={(e) =>
-                  setFormData({ ...formData, vipHighlight: e.target.checked })
-                }
-                className="w-4 h-4 text-blue-900 border-gray-300 rounded"
-              />
-              <span className="text-sm text-gray-700">VIP zvýraznění</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.publishImmediately}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    publishImmediately: e.target.checked,
-                  })
-                }
-                className="w-4 h-4 text-blue-900 border-gray-300 rounded"
-              />
-              <span className="text-sm text-gray-700">
-                Okamžitě publikovat
-              </span>
-            </label>
-          </div>
-
-          <div className="flex gap-4 pt-4">
-            <button
-              type="button"
-              onClick={() => handleSubmit("draft")}
-              className="px-6 py-2 border border-[#D2DED8] text-blue-900 rounded-md hover:bg-[#E7EFEA] transition-colors"
-            >
-              Uložit koncept
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSubmit("published")}
-              className="px-6 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800 transition-colors"
-            >
-              Publikovat
-            </button>
-          </div>
-        </form>
+    <div className="p-6 max-w-3xl">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h1 className="text-lg font-semibold">
+          Přidat novou nabídku
+        </h1>
+        <Link
+          href="/account/offers"
+          className="text-sm text-blue-700 hover:underline"
+        >
+          Zpět na přehled
+        </Link>
       </div>
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* ZÁKLADNÍ INFORMACE */}
+        <section className="space-y-4 rounded-md border border-gray-200 bg-white p-4">
+          <h2 className="text-sm font-semibold">
+            1️⃣ Základní informace
+          </h2>
+
+          {/* Název nabídky */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Název nabídky <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.title}
+              onChange={handleChange("title")}
+              required
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Kosmetické ošetření pleti – hydratace"
+            />
+          </div>
+
+          {/* Kategorie (zatím jedna) */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Kategorie <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.category}
+              onChange={handleChange("category")}
+              required
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Kosmetika, Masáže, Gastro…"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Více kategorií / podkategorií bude řešeno v samostatném
+              úkolu. Zatím uveď hlavní kategorii textově.
+            </p>
+          </div>
+
+          {/* Lokalita: město + ulice */}
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Město <span className="text-red-600">*</span>
+              </label>
+              <input
+                type="text"
+                value={form.city}
+                onChange={handleChange("city")}
+                required
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                placeholder="Praha, Brno…"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Ulice / adresa
+              </label>
+              <input
+                type="text"
+                value={form.streetAddress}
+                onChange={handleChange("streetAddress")}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                placeholder="Např. Národní 1"
+              />
+            </div>
+          </div>
+
+          {/* Popis nabídky */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Popis nabídky <span className="text-red-600">*</span>
+            </label>
+            <textarea
+              value={form.description}
+              onChange={handleChange("description")}
+              required
+              rows={5}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Popiš průběh služby, co klient zažije, jaký je efekt…"
+            />
+          </div>
+        </section>
+
+        {/* CENY A AKCE */}
+        <section className="space-y-4 rounded-md border border-gray-200 bg-white p-4">
+          <h2 className="text-sm font-semibold">
+            2️⃣ Ceny a akce
+          </h2>
+
+          {/* Základní cena */}
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Základní cena (Kč){" "}
+                <span className="text-red-600">*</span>
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={form.price}
+                onChange={handleChange("price")}
+                required
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                placeholder="Např. 900"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Délka služby (volitelné)
+              </label>
+              <input
+                type="text"
+                value={form.duration}
+                onChange={handleChange("duration")}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                placeholder="Např. 60 min"
+              />
+            </div>
+          </div>
+
+          {/* Více cenových variant */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Více cenových variant (volitelné)
+            </label>
+            <textarea
+              value={form.priceVariants}
+              onChange={handleChange("priceVariants")}
+              rows={3}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Např. 30 min – 500 Kč | 60 min – 900 Kč"
+            />
+          </div>
+
+          {/* Bonusy / akce */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Bonusy / akce (volitelné)
+            </label>
+            <input
+              type="text"
+              value={form.bonusText}
+              onChange={handleChange("bonusText")}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Např. První návštěva -20 %"
+            />
+          </div>
+        </section>
+
+        {/* DETAILY NABÍDKY */}
+        <section className="space-y-4 rounded-md border border-gray-200 bg-white p-4">
+          <h2 className="text-sm font-semibold">
+            4️⃣ Detaily nabídky
+          </h2>
+
+          {/* Co je zahrnuto v ceně */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Co je zahrnuto v ceně
+            </label>
+            <textarea
+              value={form.included}
+              onChange={handleChange("included")}
+              rows={4}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="✔ Konzultace&#10;✔ Ošetření&#10;✔ Závěrečná maska"
+            />
+          </div>
+
+          {/* Podmínky / omezení */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Podmínky / omezení
+            </label>
+            <textarea
+              value={form.conditions}
+              onChange={handleChange("conditions")}
+              rows={3}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Např. Pouze pro nové klienty, nelze kombinovat s jinou akcí"
+            />
+          </div>
+
+          {/* Pro koho je nabídka vhodná */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Pro koho je nabídka vhodná
+            </label>
+            <input
+              type="text"
+              value={form.suitableFor}
+              onChange={handleChange("suitableFor")}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Např. ženy, muži, páry, sportovci…"
+            />
+          </div>
+        </section>
+
+        {/* DOSTUPNOST */}
+        <section className="space-y-4 rounded-md border border-gray-200 bg-white p-4">
+          <h2 className="text-sm font-semibold">
+            5️⃣ Dostupnost
+          </h2>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              Poznámka k dostupnosti (volitelné)
+            </label>
+            <textarea
+              value={form.availabilityNote}
+              onChange={handleChange("availabilityNote")}
+              rows={3}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              placeholder="Např. Každý čtvrtek 18:00, nebo dle domluvy."
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Plnohodnotný kalendář a rezervace budou řešeny v samostatném
+              úkolu.
+            </p>
+          </div>
+        </section>
+
+        {/* AKCE FORMULÁŘE */}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            onClick={() => setSubmitStatus("draft")}
+            className="rounded-md border border-gray-300 px-4 py-2 text-sm"
+          >
+            Uložit koncept
+          </button>
+          <button
+            type="submit"
+            onClick={() => setSubmitStatus("published")}
+            className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
+          >
+            Publikovat
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/account/offers")}
+            className="rounded-md px-4 py-2 text-sm text-gray-700"
+          >
+            Zrušit
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
+
+// END BLOCK: OFFER_NEW_PAGE

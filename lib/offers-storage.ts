@@ -6,6 +6,16 @@ export type Offer = {
   price: string;
   status: "draft" | "published" | "paused";
   createdAt: string;
+  // UPDATE(2025-11-19): Rozšíření Offer o detailní textová pole
+  description?: string;
+  streetAddress?: string;
+  priceVariants?: string;
+  bonusText?: string;
+  duration?: string;
+  included?: string;
+  conditions?: string;
+  suitableFor?: string;
+  availabilityNote?: string;
 };
 
 export type NewOfferInput = {
@@ -15,6 +25,16 @@ export type NewOfferInput = {
   price: string;
   status?: "draft" | "published" | "paused";
   createdAt?: string;
+  // UPDATE(2025-11-19): Rozšíření NewOfferInput o detailní textová pole
+  description?: string;
+  streetAddress?: string;
+  priceVariants?: string;
+  bonusText?: string;
+  duration?: string;
+  included?: string;
+  conditions?: string;
+  suitableFor?: string;
+  availabilityNote?: string;
 };
 
 const STORAGE_KEY = "aspeti_offers_v1";
@@ -98,6 +118,16 @@ export function createOffer(input: NewOfferInput): Offer {
     price: input.price,
     status: input.status || "draft",
     createdAt: input.createdAt || new Date().toISOString(),
+    // UPDATE(2025-11-19): Rozšíření Offer o detailní textová pole
+    description: input.description,
+    streetAddress: input.streetAddress,
+    priceVariants: input.priceVariants,
+    bonusText: input.bonusText,
+    duration: input.duration,
+    included: input.included,
+    conditions: input.conditions,
+    suitableFor: input.suitableFor,
+    availabilityNote: input.availabilityNote,
   };
 
   const offers = loadOffers();
@@ -119,7 +149,14 @@ export function updateOffer(id: string, patch: Partial<Offer>): Offer | null {
     return null;
   }
 
-  const updatedOffer = { ...offers[index], ...patch, id };
+  // UPDATE(2025-11-19): Zachování původních polí (id, createdAt) + aplikace patch
+  const existing = offers[index];
+  const updatedOffer = { 
+    ...existing, 
+    ...patch, 
+    id: existing.id, // Zachovat původní ID
+    createdAt: existing.createdAt, // Zachovat původní createdAt
+  };
   const updated = [...offers];
   updated[index] = updatedOffer;
   saveOffers(updated);
@@ -143,5 +180,6 @@ export function setStatus(
   id: string,
   status: "published" | "paused" | "draft"
 ): Offer | null {
+  // UPDATE(2025-11-19): Typová úprava pro rozšíření Offer
   return updateOffer(id, { status });
 }
