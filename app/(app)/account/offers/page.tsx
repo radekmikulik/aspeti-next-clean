@@ -7,28 +7,10 @@ import {
   setStatus,
   deleteOffer,
   duplicateOffer,
+  type Offer,
 } from "@/lib/offers-storage";
 
 type OfferStatus = "draft" | "published" | "paused";
-
-interface Offer {
-  id: string;
-  title: string;
-  category: string;
-  city: string;
-  streetAddress?: string;
-  price: string;
-  description?: string;
-  priceVariants?: string;
-  bonusText?: string;
-  duration?: string;
-  included?: string;
-  conditions?: string;
-  suitableFor?: string;
-  availabilityNote?: string;
-  status: OfferStatus;
-  createdAt: string;
-}
 
 // BLOCK: OFFERS_PAGE
 // PURPOSE: Výpis a základní správa nabídek na route /account/offers
@@ -44,26 +26,51 @@ export default function OffersPage() {
   }, []);
 
   const reloadOffers = () => {
+    // UPDATE(2025-11-19): Přidán debug log pro sledování reload operace
+    console.log(`[DEBUG] reloadOffers called`);
     const data = getAllOffers() as Offer[] | null;
+    const offersCount = Array.isArray(data) ? data.length : 0;
+    console.log(`[DEBUG] reloadOffers - loaded ${offersCount} offers`);
     setOffers(Array.isArray(data) ? data : []);
   };
 
   const handleSetStatus = (id: string, status: OfferStatus) => {
-    setStatus(id, status);
-    reloadOffers();
-    // TODO(TOAST): success/info - změna stavu nabídky
+    console.log(`[DEBUG] handleSetStatus called for ${id} with status ${status}`);
+    const result = setStatus(id, status);
+    console.log(`[DEBUG] setStatus result:`, result);
+    if (result) {
+      reloadOffers();
+      // TODO(TOAST): success/info - změna stavu nabídky
+    } else {
+      console.error(`[ERROR] Failed to set status for offer ${id}`);
+    }
   };
 
   const handleDelete = (id: string) => {
-    deleteOffer(id);
-    reloadOffers();
-    // TODO(TOAST): success - nabídka smazána
+    console.log(`[DEBUG] handleDelete called for ${id}`);
+    try {
+      deleteOffer(id);
+      reloadOffers();
+      // TODO(TOAST): success - nabídka smazána
+    } catch (error) {
+      console.error(`[ERROR] Failed to delete offer ${id}:`, error);
+    }
   };
 
   const handleDuplicate = (id: string) => {
-    duplicateOffer(id);
-    reloadOffers();
-    // TODO(TOAST): success - vytvořen duplikát jako koncept
+    console.log(`[DEBUG] handleDuplicate called for ${id}`);
+    try {
+      const result = duplicateOffer(id);
+      console.log(`[DEBUG] duplicateOffer result:`, result);
+      if (result) {
+        reloadOffers();
+        // TODO(TOAST): success - vytvořen duplikát jako koncept
+      } else {
+        console.error(`[ERROR] Failed to duplicate offer ${id}`);
+      }
+    } catch (error) {
+      console.error(`[ERROR] Exception in handleDuplicate for ${id}:`, error);
+    }
   };
 
   return (

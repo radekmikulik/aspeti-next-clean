@@ -168,8 +168,11 @@ export function updateOffer(id: string, patch: Partial<Offer>): Offer | null {
  * Smaže nabídku podle ID
  */
 export function deleteOffer(id: string): void {
+  // UPDATE(2025-11-19): Přidán debug log pro sledování delete operace
+  console.log(`[DEBUG] deleteOffer called with id: ${id}`);
   const offers = loadOffers();
   const filtered = offers.filter((offer) => offer.id !== id);
+  console.log(`[DEBUG] Filtered offers count: ${filtered.length} (was ${offers.length})`);
   saveOffers(filtered);
 }
 
@@ -180,22 +183,31 @@ export function setStatus(
   id: string,
   status: "published" | "paused" | "draft"
 ): Offer | null {
-  // UPDATE(2025-11-19): Typová úprava pro rozšíření Offer
-  return updateOffer(id, { status });
+  // UPDATE(2025-11-19): Přidán debug log pro sledování změny statusu
+  console.log(`[DEBUG] setStatus called with id: ${id}, status: ${status}`);
+  const result = updateOffer(id, { status });
+  console.log(`[DEBUG] setStatus result:`, result ? 'success' : 'failed');
+  return result;
 }
 
 // ADD(2025-11-19): duplicateOffer - vytvoření kopie nabídky jako koncept
 export function duplicateOffer(id: string): Offer | null {
+  // UPDATE(2025-11-19): Přidán debug log + vylepšená identifikace duplikátu
+  console.log(`[DEBUG] duplicateOffer called with id: ${id}`);
   const offers = loadOffers();
   const originalOffer = offers.find((offer) => offer.id === id);
   
   if (!originalOffer) {
+    console.error(`[ERROR] Original offer with id ${id} not found`);
     return null;
   }
   
+  console.log(`[DEBUG] Original offer found:`, originalOffer.title);
+  
   const duplicatedOffer: Offer = {
     id: Date.now().toString(),
-    title: originalOffer.title,
+    // UPDATE(2025-11-19): Přidán "(kopie)" suffix pro lepší identifikaci
+    title: `${originalOffer.title} (kopie)`,
     category: originalOffer.category,
     city: originalOffer.city,
     streetAddress: originalOffer.streetAddress,
@@ -214,6 +226,7 @@ export function duplicateOffer(id: string): Offer | null {
   
   const updatedOffers = [...offers, duplicatedOffer];
   saveOffers(updatedOffers);
+  console.log(`[DEBUG] Duplicated offer saved with id: ${duplicatedOffer.id}`);
   
   return duplicatedOffer;
 }
