@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getAllOffers, setStatus, type Offer } from "@/lib/offers-storage";
+import { getAccountCredit, addAccountCredit, type AccountCreditState } from "@/lib/account-credit-storage";
 
 type OfferStatus = Offer["status"];
 
@@ -60,15 +61,27 @@ const mockReservations = [
 
 export default function DashboardPage() {
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [accountCredit, setAccountCredit] = useState<AccountCreditState>({ balance: 0 });
+  const [showCreditModal, setShowCreditModal] = useState(false);
+  const [creditAmount, setCreditAmount] = useState<string>("");
 
   useEffect(() => {
     const data = getAllOffers() as Offer[] | null;
     setOffers(Array.isArray(data) ? data : []);
+    
+    // Load account credit from storage
+    const credit = getAccountCredit();
+    setAccountCredit(credit);
   }, []);
 
   const reloadOffers = () => {
     const data = getAllOffers() as Offer[] | null;
     setOffers(Array.isArray(data) ? data : []);
+  };
+
+  const reloadAccountCredit = () => {
+    const credit = getAccountCredit();
+    setAccountCredit(credit);
   };
 
   const handleToggleStatus = (offer: Offer) => {
@@ -77,6 +90,25 @@ export default function DashboardPage() {
     setStatus(offer.id, nextStatus);
     reloadOffers();
     // TODO(TOAST): info - změna stavu nabídky z přehledu
+  };
+
+  const handleAddCredit = () => {
+    const amount = parseFloat(creditAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Zadejte platnou částku (více než 0 Kč)");
+      return;
+    }
+    
+    try {
+      addAccountCredit(amount);
+      reloadAccountCredit();
+      setShowCreditModal(false);
+      setCreditAmount("");
+      alert(`Kredit byl úspěšně dobit o ${amount} Kč`);
+    } catch (error) {
+      alert("Chyba při dobíjení kreditu");
+      console.error("Credit add error:", error);
+    }
   };
 
   const featuredOffers = offers.slice(0, 3);
@@ -145,13 +177,12 @@ export default function DashboardPage() {
             <h2 className="text-sm font-semibold text-gray-900">
               Nedávné zprávy
             </h2>
-            <button
-              type="button"
+            <Link
+              href="/account/messages"
               className="text-xs font-medium text-blue-700 hover:underline"
             >
               Otevřít inbox
-              {/* TODO: future route /account/messages */}
-            </button>
+            </Link>
           </div>
           <div className="space-y-2">
             {mockMessages.map((msg) => (
@@ -322,7 +353,7 @@ export default function DashboardPage() {
           </h2>
           <div className="text-xs text-gray-600">Zůstatek:</div>
           <div className="mt-1 text-xl font-semibold text-gray-900">
-            420 Kč
+            {accountCredit.balance} Kč
           </div>
           <p className="mt-2 text-xs text-gray-600">
             Kredit se postupně odečítá podle aktivních nabídek a kampaní.
@@ -330,10 +361,10 @@ export default function DashboardPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
+              onClick={() => setShowCreditModal(true)}
               className="rounded-full bg-emerald-700 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-800"
             >
               Dobít kredit
-              {/* TODO: future billing flow */}
             </button>
             <button
               type="button"
@@ -345,6 +376,69 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Credit Modal */}
+      {showCreditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+              Dobít kredit
+            </h3>
+            <p className="mb-4 text-sm text-gray-600">
+              Zadejte částku, kterou chcete dobit na váš účet:
+            </p>
+            
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Částka (Kč)
+              </label>
+              <input
+                type="number"
+                value={creditAmount}
+                onChange={(e) => setCreditAmount(e.target.value)}
+                placeholder="např. 100"
+                min="1"
+                step="1"
+                className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+            
+            <div className="mb-4 grid grid-cols-4 gap-2">
+              {[50, 100, 200, 500].map((amount) => (
+                <button
+                  key={amount}
+                  type="button"
+                  onClick={() => setCreditAmount(amount.toString())}
+                  className="rounded-xl border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  +{amount} Kč
+                </button>
+              ))}
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreditModal(false);
+                  setCreditAmount("");
+                }}
+                className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Zrušit
+              </button>
+              <button
+                type="button"
+                onClick={handleAddCredit}
+                disabled={!creditAmount || parseFloat(creditAmount) <= 0}
+                className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Dobít {creditAmount ? `${creditAmount} Kč` : ""}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
