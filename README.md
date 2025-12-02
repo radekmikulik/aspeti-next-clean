@@ -1,18 +1,38 @@
+⚠️ ARCHIVE WARNING
+====================
+Tento repozitář je označen jako **ARCHIVNÍ** a není nadále aktivně udržován.
+
+**ℹ️ Aktuální oficiální repozitář pro ASPETI aplikaci je:**
+👉 https://github.com/radekmikulik/aspeti-next-app
+
+**🔗 Pro aktuální produkční deployment použijte:**
+👉 Vercel: `aspeti-next-clean-prod`
+
+**📖 Detailní informace:** Čtěte `INFRA_SINGLE_SOURCE_OF_TRUTH.md` v hlavním repozitáři
+
+---
+
+> **Tento repozitář může být v budoucnu archivován nebo smazán.**  
+> **Pro nový vývoj používjte pouze oficiální repozitář:** `radekmikulik/aspeti-next-app`
+
+---
+
 # aspeti-next-clean
 
-Poskytovatelský účet ASPETi - Next.js App Router projekt s localStorage
+Poskytovatel služeb ČSNěk Aplikace pro ASPETi - Next.js App Router projekt s localStorage
 
-## Přehled
+## 🗂️ Přehled
 
-Toto je aplikační část ASPETi pro správu nabídek poskytovatelů. Projekt obsahuje:
+Toto je projekt aplikace ASPETi pro správnu nabídkovky s poskytovateli.
+Projekt obsahuje:
 
 - Dashboard s KPI metrikami
-- Správa nabídek s localStorage persistence
-- Formulář pro přidání nových nabídek
-- 7 stub stránek pro budoucí funkce
-- ASPETi sage design paleta (#F5F7F6, #CAD8D0, #D2DED8, #C8D6CF, #E7EFEA)
+- Správa nabídek s localStorage perzistencí
+- Formulář pro nové nabídky
+- 7 studií stranek pro budoucí funkce
+- ASPETi sage design palety (#F5F7F6, #CAD0D0, #D2DED8, #C8D6CF, #E7EFEA)
 
-## Technologie
+## 🔧 Technologie
 
 - **Next.js** 16.0.3 (App Router)
 - **React** 19.2.0
@@ -20,78 +40,80 @@ Toto je aplikační část ASPETi pro správu nabídek poskytovatelů. Projekt o
 - **Tailwind CSS** 4.1.17
 - **Node.js** >=20.9.0 (REQUIRED)
 
-## Struktura projektu
+## 📂 Struktura projektu
 
-```
+```bash
 app/
-├── (app)/account/          # Route group pro poskytovatelský účet
-│   ├── layout.tsx          # AccountTopbar + levý sidebar
-│   ├── page.tsx            # Dashboard s KPI
-│   ├── offers/
-│   │   ├── page.tsx        # Tabulka nabídek (localStorage)
-│   │   └── new/page.tsx    # Formulář nové nabídky
-│   └── [7 stub stránek]    # messages, reservations, vip, stats, billing, profile, settings
-├── layout.tsx              # Root layout (cs-CZ)
-├── page.tsx                # Homepage
-└── globals.css             # Sage barvy
+  (app)/
+    account/
+      page.tsx                    # Route group pro poskytovatelské stránky
+      layout.tsx                  # AccountTopbar + level sidebar
+      page.tsx                    # Dashboard s KPI
+      offers/
+        page.tsx                  # Tabulka nabídek (localStorage)
+        new/page.tsx              # Formulář nové nabídky
+        [7 stub stráněk]          # messages, reservations, vip, stats, billing, profile, settings
+    
+    layout.tsx                    # Root layout (cs-CZ)
+    page.tsx                      # Homepage
+    globals.css                   # Sage bartry
 
 components/
-├── AccountTopbar.tsx       # Top navigace
-└── AccountSidebar.tsx      # Levé menu (9 položek)
+  AccountTopbar.tsx               # Top navigace
+  AccountSidebar.tsx              # Levé menu (9 položek)
 
 lib/
-└── offers-storage.ts       # localStorage API (aspeti_offers_v1)
+  offers-storage.ts               # localStorage API (aspeti_offers_v1)
 ```
 
-## Funkce
+## 🚀 Funkce
 
-### Dashboard (/account)
-- 3 KPI karty: Zobrazení (482), Kliky (97), Rezervace (3)
-- Blok "Co zlepšit" se 3 doporučeními
+### 📊 Dashboard (/account)
+- 3 KPI karty: Zobrazení (480), Kličky (97), Rezervace (3)
+- Blok "Co zlepšit" s 3 doporučeními
 
-### Správa nabídek (/account/offers)
+### 📝 Správa nabídek (/account/offers)
 - Tabulka s demo nabídkami
-- Akce: Upravit, Pozastavit/Obnovit, Smazat
-- localStorage persistence
+- Akce: Upráhvit, Pozastavit/Obnosit, Smazat
+- localStorage perzistence
 
-### Formulář (/account/offers/new)
-- Vstupy: Název, Kategorie, Město, Cena, Popis
-- Checkboxy: VIP zvýraznění, Okamžitě publikovat
-- Tlačítka: Uložit koncept, Publikovat
+### 🆕 Formulář (/account/offers/new)
+- Vstupy: Názeh, Kategorie, Město, Cena, Čekboxy (VIP známe, Obrátěk pověst), Telefon (kontakt)
+- Submit/Reset
 
-## Lokální development
+### 👨‍💻 Lokální development
 
 ```bash
 # Instalace závislostí
-pnpm install
+npm install
 
 # Development server
-pnpm dev
+npm run dev
 
 # Build (vyžaduje Node >=20.9.0)
-pnpm build
+npm run build
 
 # Production server
-pnpm start
+npm start
 ```
 
-**POZNÁMKA:** Lokální build vyžaduje Node.js 20.x nebo vyšší.
+> **Požadovaná verze:** Node.js 20.x nebo novější.
 
-## Deployment na Vercel
+## 🛠️ Deployment na Vercel
 
-### Automatický deployment (vyžaduje credentials)
+### 🚀 Automatický deployment (vercel credentials)
 
 ```bash
-# Nastavit environment variables
+# Nastavte environment proměnné
 export GITHUB_TOKEN="ghp_..."
 export VERCEL_TOKEN="..."
 export VERCEL_USER_ID="..."
 
-# Spustit deployment skript
+# Spustí deployment skript
 python3 deploy.py
 ```
 
-### Manuální deployment
+### 📦 Manuel deployment
 
 1. **GitHub:**
    ```bash
@@ -101,15 +123,15 @@ python3 deploy.py
    ```
 
 2. **Vercel:**
-   - Importovat repo z GitHubu
+   - Import repo z GitHub
    - Framework Preset: **Next.js**
-   - Node.js Version: **20.x** (CRITICAL!)
+   - Node.js Version: **20.x** (KRITICKÉ!)
    - Build Command: `next build` (default)
    - Output Directory: `.next` (default)
 
-Detailní instrukce: viz [DEPLOYMENT.md](./DEPLOYMENT.md)
+Detaily instrukce: viz [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-## localStorage Schema
+## 📝 localStorage Schema
 
 ```typescript
 // Key: aspeti_offers_v1
@@ -124,29 +146,29 @@ interface Offer {
 }
 ```
 
-## Demo nabídky
+## 🗺️ Demo nabídky
 
 Projekt obsahuje 2 demo nabídky:
 1. "Lash lifting + brow shape" - Praha 1, 690 Kč
 2. "Masáž zad 45 min" - Brno, 590 Kč
 
-## Design paleta
+## 🎨 Design palety
 
 - **Background:** #F5F7F6
-- **Sage borders:** #D2DED8, #CAD8D0, #C8D6CF
+- **Sage borders:** #D2DED8, #CAD0D0, #C8D6CF
 - **Sage highlights:** #E7EFEA
 - **Text:** Navy blue (#1e3a8a)
 
-## Browser Support
+## 🌐 Browser Support
 
 - Chrome/Edge 90+
 - Firefox 88+
 - Safari 14+
 
-## License
+## 📜 Licence
 
-Private project - ASPETi
+Privátní projekt - ASPETi
 
-## Autor
+## 👤 Autor
 
 MiniMax Agent | 2025-11-18
