@@ -1,0 +1,13 @@
+{
+  "todos": {
+    "Coordinator": {
+      "1": {
+        "id": "1",
+        "content": "Aktualizovat Next.js verzi pro kompatibilitu s Node.js 20.x+ na Vercelu",
+        "details": "1. Analyzovat aktuální package.json a Next.js konfiguraci\n2. Aktualizovat Next.js z 16.0.3 na kompatibilní verzi (14.2+ nebo 15.x)\n3. Zkontrolovat závislosti a kompatibilitu\n4. Otestovat lokálně funkčnost\n5. Commit změn na GitHub\n6. Spustit redeployment na Vercel\n7. Ověřit, že runtime chyba zmizí\n8. Zkontrolovat, že Quick Actions obsahuje pouze 'Přidat nabídku'",
+        "status": "pending",
+        "priority": "high"
+      }
+    }
+  }
+}
