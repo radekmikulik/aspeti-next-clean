@@ -1,22 +1,22 @@
 📄 Extracted from page: Login – Vercel
-URL: https://vercel.com/login
+URL: https://vercel.com/login?next=%2Fdashboard
 
 Extracted content:
 ```json
 {
     "title": "Login – Vercel",
-    "url": "https://vercel.com/login",
-    "summary": "The Vercel login page provides multiple options for users to sign in to their Vercel account. It prominently displays various authentication methods, including a direct option to 'Continue with GitHub', alongside other common login providers and specific Vercel functionalities.",
+    "url": "https://vercel.com/login?next=%2Fdashboard",
+    "summary": "Tato stránka slouží k přihlášení do platformy Vercel. Uživatelům je nabídnuto několik různých metod pro ověření identity a přístup k jejich účtu nebo dashboardu. Kromě přihlašovacích možností obsahuje stránka také odkaz na registraci nového účtu a odkazy na právní dokumenty Vercel.",
     "key_points": [
-        "The page is for logging into a Vercel account.",
-        "One of the available login options is 'Continue with GitHub'.",
-        "Other login options include 'Continue with Email', 'Continue with Google', 'Continue with SAML SSO', and 'Continue with Passkey'.",
-        "There is a link to 'Show other options', suggesting additional methods might be available.",
-        "Users who do not have an account can sign up via a dedicated link.",
-        "Links to Vercel's Terms and Privacy Policy are provided at the bottom of the page."
+        "Možnost přihlášení pomocí e-mailu ('Continue with Email')",
+        "Možnost přihlášení přes účet Google ('Continue with Google')",
+        "Možnost přihlášení přes účet GitHub ('Continue with GitHub')",
+        "Možnost přihlášení přes SAML SSO ('Continue with SAML SSO')",
+        "Možnost přihlášení pomocí Passkey ('Continue with Passkey')",
+        "Odkaz na registraci nového účtu pro uživatele, kteří ještě nemají účet Vercel."
     ],
     "relevant_links": [
-        "/signup",
+        "/signup?next=%2Fdashboard",
         "/legal/terms",
         "/legal/privacy-policy"
     ],
