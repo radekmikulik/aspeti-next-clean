@@ -1,4 +1,3 @@
-2025/12/03-12:21:56.420 1c45 Creating DB /workspace/browser/user_data/Default/Sync Data/LevelDB since it was missing.
-2025/12/03-12:21:56.446 1c45 Reusing MANIFEST /workspace/browser/user_data/Default/Sync Data/LevelDB/MANIFEST-000001
-2025/12/03-12:21:56.459 1c45 Recovering log #3
-2025/12/03-12:21:56.463 1c45 Reusing old log /workspace/browser/user_data/Default/Sync Data/LevelDB/000003.log 
+2025/12/03-19:26:09.269 1ecf Reusing MANIFEST /workspace/browser/user_data/Default/Sync Data/LevelDB/MANIFEST-000001
+2025/12/03-19:26:09.275 1ecf Recovering log #3
+2025/12/03-19:26:09.277 1ecf Reusing old log /workspace/browser/user_data/Default/Sync Data/LevelDB/000003.log 

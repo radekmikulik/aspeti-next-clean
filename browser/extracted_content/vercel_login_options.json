@@ -1,0 +1,25 @@
+📄 Extracted from page: Login – Vercel
+URL: https://vercel.com/login
+
+Extracted content:
+```json
+{
+    "title": "Login – Vercel",
+    "url": "https://vercel.com/login",
+    "summary": "The Vercel login page provides multiple options for users to sign in to their Vercel account. It prominently displays various authentication methods, including a direct option to 'Continue with GitHub', alongside other common login providers and specific Vercel functionalities.",
+    "key_points": [
+        "The page is for logging into a Vercel account.",
+        "One of the available login options is 'Continue with GitHub'.",
+        "Other login options include 'Continue with Email', 'Continue with Google', 'Continue with SAML SSO', and 'Continue with Passkey'.",
+        "There is a link to 'Show other options', suggesting additional methods might be available.",
+        "Users who do not have an account can sign up via a dedicated link.",
+        "Links to Vercel's Terms and Privacy Policy are provided at the bottom of the page."
+    ],
+    "relevant_links": [
+        "/signup",
+        "/legal/terms",
+        "/legal/privacy-policy"
+    ],
+    "file_name": "vercel_login_options.json"
+}
+```

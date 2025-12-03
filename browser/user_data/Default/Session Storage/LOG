@@ -1,4 +1,3 @@
-2025/12/03-12:21:56.528 1c9b Creating DB /workspace/browser/user_data/Default/Session Storage since it was missing.
-2025/12/03-12:21:56.596 1c9b Reusing MANIFEST /workspace/browser/user_data/Default/Session Storage/MANIFEST-000001
-2025/12/03-12:21:56.601 1c9b Recovering log #3
-2025/12/03-12:21:56.605 1c9b Reusing old log /workspace/browser/user_data/Default/Session Storage/000003.log 
+2025/12/03-18:43:53.299 1b06 Reusing MANIFEST /workspace/browser/user_data/Default/Session Storage/MANIFEST-000001
+2025/12/03-18:43:53.304 1b06 Recovering log #3
+2025/12/03-18:43:53.309 1b06 Reusing old log /workspace/browser/user_data/Default/Session Storage/000003.log 
