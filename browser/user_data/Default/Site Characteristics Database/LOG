@@ -1,0 +1,4 @@
+2025/12/03-12:21:56.423 1c90 Creating DB /workspace/browser/user_data/Default/Site Characteristics Database since it was missing.
+2025/12/03-12:21:56.466 1c90 Reusing MANIFEST /workspace/browser/user_data/Default/Site Characteristics Database/MANIFEST-000001
+2025/12/03-12:21:56.491 1c90 Recovering log #3
+2025/12/03-12:21:56.495 1c90 Reusing old log /workspace/browser/user_data/Default/Site Characteristics Database/000003.log 

@@ -1,0 +1,4 @@
+2025/12/03-12:21:56.795 1c43 Creating DB /workspace/browser/user_data/Default/shared_proto_db since it was missing.
+2025/12/03-12:21:56.816 1c43 Reusing MANIFEST /workspace/browser/user_data/Default/shared_proto_db/MANIFEST-000001
+2025/12/03-12:21:56.820 1c43 Recovering log #3
+2025/12/03-12:21:56.826 1c43 Reusing old log /workspace/browser/user_data/Default/shared_proto_db/000003.log 

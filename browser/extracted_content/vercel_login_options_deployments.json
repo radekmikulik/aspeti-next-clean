@@ -1,0 +1,23 @@
+📄 Extracted from page: Login – Vercel
+URL: https://vercel.com/login?next=%2Fradekmikulik%2Faspeti-next-clean-prod%2Fdeployments
+
+Extracted content:
+```json
+{
+  "title": "Login – Vercel",
+  "url": "https://vercel.com/login?next=%2Fradekmikulik%2Faspeti-next-clean-prod%2Fdeployments",
+  "summary": "This page provides various options for users to log in to their Vercel account. Upon successful login, the user will be redirected to the deployment page specified in the URL's 'next' parameter.",
+  "key_points": [
+    "Users can log in to Vercel using the following options: Email, Google, GitHub, SAML SSO, or Passkey.",
+    "The page indicates a 'Show other options' link, suggesting there might be additional login methods.",
+    "For new users, there's an option to 'Sign Up' for a Vercel account.",
+    "The URL's 'next' parameter (`/radekmikulik/aspeti-next-clean-prod/deployments`) indicates that after a successful login, the user will be automatically directed to the specified deployment page."
+  ],
+  "relevant_links": [
+    "/signup?next=%2Fradekmikulik%2Faspeti-next-clean-prod%2Fdeployments",
+    "/legal/terms",
+    "/legal/privacy-policy"
+  ],
+  "file_name": "vercel_login_options_deployments.json"
+}
+```
