@@ -140,8 +140,7 @@ export default function DashboardPage() {
               Rychlé akce
             </h2>
             <p className="text-xs text-gray-600">
-              Přidejte novou nabídku, nahrajte fotky nebo pozvěte kolegu do
-              týmu.
+              Přidejte novou nabídku.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -151,20 +150,6 @@ export default function DashboardPage() {
             >
               + Přidat nabídku
             </Link>
-            <button
-              type="button"
-              className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
-            >
-              Nahrát fotky
-              {/* TODO: future route /account/media nebo modal */}
-            </button>
-            <button
-              type="button"
-              className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
-            >
-              Pozvat člena
-              {/* TODO: future route /account/team */}
-            </button>
           </div>
         </div>
       </section>
@@ -270,11 +255,8 @@ export default function DashboardPage() {
             </table>
           </div>
         </div>
-      </section>
 
-      {/* Moje nabídky + Kredit */}
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        {/* Moje nabídky – preview */}
+        {/* Moje nabídky + Kredit */}
         <div className="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-900">
