@@ -1,0 +1,38 @@
+📄 Extracted from page: ASPETi – Můj účet (app)
+URL: https://aspeti-next-clean-prod.vercel.app/account/
+
+Extracted content:
+```json
+{
+  "title": "ASPETi – Můj účet (app)",
+  "url": "https://aspeti-next-clean-prod.vercel.app/account/",
+  "summary": "The page is a dashboard for a service provider's account. It offers an overview of key statistics such as daily views, clicks on details, new messages, and daily reservations. It provides quick actions like adding a new offer, uploading photos, and inviting a team member. The page also lists recent messages, today's reservations, active offers with editing options, and the current account credit balance. Navigation links to various sections like Settings, Offers, Messages, Reservations, Billing, and Profile are present. The specific text \"Úspěšně se vám podařilo dostat na account stránku!\" was not found on this page.",
+  "key_points": [
+    "The page functions as a 'poskytovatelský účet' (provider's account) dashboard.",
+    "Key statistics displayed include: Dnešní zobrazení (Today's views): 1284, Kliky na detail (Clicks on detail): 142, Nové zprávy (New messages): 3, Rezervace dnes (Reservations today): 5.",
+    "Quick actions available are: 'Přidat novou nabídku' (Add new offer), 'Nahrát fotky' (Upload photos), and 'Pozvat člena' (Invite member).",
+    "Both 'Nahrát fotky' and 'Pozvat člena' buttons are present on the page.",
+    "Recent messages from clients are shown.",
+    "Today's reservations are listed with client names, services, and 'Potvrdit' (Confirm) / 'Zrušit' (Cancel) actions.",
+    "Two active offers, 'Lash lifting + brow shape' and 'Masáž zad 45 min', are displayed with 'Upravit' (Edit) and 'Pozastavit' (Pause) options.",
+    "The account credit balance is 420 Kč, with options to 'Dobít kredit' (Recharge credit) and view 'Faktury' (Invoices).",
+    "The specific text \"Úspěšně se vám podařilo dostat na account stránku!\" is NOT present on the page."
+  ],
+  "relevant_links": [
+    "/",
+    "/account/settings/",
+    "/account/",
+    "/account/offers/",
+    "/account/offers/new/",
+    "/account/messages/",
+    "/account/reservations/",
+    "/account/vip/",
+    "/account/stats/",
+    "/account/billing/",
+    "/account/profile/",
+    "/account/offers/1/edit/",
+    "/account/offers/2/edit/"
+  ],
+  "file_name": "aspeti_account_page.json"
+}
+```

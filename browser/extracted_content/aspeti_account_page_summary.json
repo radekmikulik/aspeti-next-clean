@@ -1,0 +1,36 @@
+📄 Extracted from page: ASPETi – Můj účet (app)
+URL: https://aspeti-next-clean-prod.vercel.app/account/
+
+Extracted content:
+```json
+{
+  "title": "ASPETi – Můj účet (app)",
+  "url": "https://aspeti-next-clean-prod.vercel.app/account/",
+  "summary": "Stránka 'Můj účet' ASPETi slouží jako dashboard pro poskytovatele služeb. Obsahuje přehled aktuálních statistik účtu, jako jsou zobrazení, kliky na detail, nové zprávy a dnešní rezervace. Na stránce jsou k dispozici rychlé akce pro přidání nové nabídky, nahrání fotografií a pozvání člena týmu. Dále zobrazuje sekce s nedávnými zprávami, dnešními rezervacemi v tabulkovém formátu s možností potvrzení/zrušení, seznam aktivních nabídek s možnostmi úprav a pozastavení, a informace o kreditu účtu s možností jeho dobití a přístupu k fakturám. Celkově poskytuje komplexní přehled a nástroje pro správu poskytovatelského účtu.",
+  "key_points": [
+    "Přehled aktuálních statistik: 1284 zobrazení, 142 kliků na detail, 3 nové zprávy, 5 rezervací dnes.",
+    "Rychlé akce zahrnují: Přidat novou nabídku, Nahrát fotky, Pozvat člena.",
+    "Sekce Nedávné zprávy zobrazuje poslední tři zprávy od klientů.",
+    "Tabulka Dnešní rezervace ukazuje detaily tří rezervací s akcemi Potvrdit/Zrušit.",
+    "Sekce Moje nabídky zobrazuje aktivní nabídky s cenou, lokalitou a stavem (TOP, Publikováno) a možnostmi Upravit/Pozastavit.",
+    "Informace o Kredit účtu: Zůstatek 420 Kč s možností Dobít kredit a zobrazit Faktury.",
+    "Navigační menu pro Nastavení, Přehled, Moje nabídky, Přidat nabídku, Zprávy, Rezervace, VIP & Propagace, Statistiky, Fakturace, Profil."
+  ],
+  "relevant_links": [
+    "/",
+    "/account/settings/",
+    "/account/",
+    "/account/offers/",
+    "/account/offers/new/",
+    "/account/messages/",
+    "/account/reservations/",
+    "/account/vip/",
+    "/account/stats/",
+    "/account/billing/",
+    "/account/profile/",
+    "/account/offers/1/edit/",
+    "/account/offers/2/edit/"
+  ],
+  "file_name": "aspeti_account_page_summary.json"
+}
+```
