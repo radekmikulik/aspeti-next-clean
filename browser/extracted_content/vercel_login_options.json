@@ -1,22 +1,23 @@
 📄 Extracted from page: Login – Vercel
-URL: https://vercel.com/login?next=%2Fdashboard
+URL: https://vercel.com/login
 
 Extracted content:
 ```json
 {
     "title": "Login – Vercel",
-    "url": "https://vercel.com/login?next=%2Fdashboard",
-    "summary": "Tato stránka slouží k přihlášení do platformy Vercel. Uživatelům je nabídnuto několik různých metod pro ověření identity a přístup k jejich účtu nebo dashboardu. Kromě přihlašovacích možností obsahuje stránka také odkaz na registraci nového účtu a odkazy na právní dokumenty Vercel.",
+    "url": "https://vercel.com/login",
+    "summary": "This page is the login portal for Vercel, offering various authentication methods to access an account. Users can choose from common identity providers or specific enterprise and passwordless solutions.",
     "key_points": [
-        "Možnost přihlášení pomocí e-mailu ('Continue with Email')",
-        "Možnost přihlášení přes účet Google ('Continue with Google')",
-        "Možnost přihlášení přes účet GitHub ('Continue with GitHub')",
-        "Možnost přihlášení přes SAML SSO ('Continue with SAML SSO')",
-        "Možnost přihlášení pomocí Passkey ('Continue with Passkey')",
-        "Odkaz na registraci nového účtu pro uživatele, kteří ještě nemají účet Vercel."
+        "Login is available via Email.",
+        "Login is available via Google account.",
+        "Login is available via GitHub account.",
+        "Login is available via SAML SSO (Single Sign-On).",
+        "Login is available via Passkey.",
+        "An option to 'Show other options' is present, suggesting potentially more authentication methods not explicitly listed.",
+        "Links for account creation (Sign Up) and legal documents (Terms, Privacy Policy) are also available."
     ],
     "relevant_links": [
-        "/signup?next=%2Fdashboard",
+        "/signup",
         "/legal/terms",
         "/legal/privacy-policy"
     ],
